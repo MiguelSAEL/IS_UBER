@@ -1,5 +1,6 @@
 package com.example.miguel.is_uber;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -36,7 +37,12 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         switch(v.getId()){
             case R.id.bLogin:
 
-                User user = new User(null,null);
+                String username = etUsername.getText().toString();
+                String password = etPassword.getText().toString();
+
+                User user = new User(username,password);
+
+                authenticate(user);
 
                 userLocalStore.storeUserData(user);
                 userLocalStore.setUserLoggedIn(true);
@@ -49,5 +55,34 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
                 break;
         }
+    }
+
+    private void authenticate(User user){
+        ServerRequests serverRequest = new ServerRequests(this);
+        serverRequest.fetchUserDataInbackground(user, new GetUserCallback() {
+            @Override
+            public void done(User returnedUser) {
+                if(returnedUser == null){
+                    showErrorMessage();
+                }   else{
+                    logUserIn(returnedUser);
+                }
+            }
+        });
+
+    }
+
+    private void showErrorMessage(){
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(Login.this);
+        dialogBuilder.setMessage("Incorrect user details");
+        dialogBuilder.setPositiveButton("Ok",null);
+        dialogBuilder.show();
+    }
+
+    private void logUserIn(User returnedUser){
+        userLocalStore.storeUserData(returnedUser);
+        userLocalStore.setUserLoggedIn(true);
+
+        startActivity(new Intent(this, MainActivity.class));
     }
 }

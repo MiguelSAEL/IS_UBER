@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onStart();
         if (authenticate() == true){
             displayUserDetails();
+        }else{
+            startActivity(new Intent(MainActivity.this, Login.class));
         }
 
     }
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         etName.setText(user.name);
         etAge.setText(user.age + "");
     }
-//Comentario
+
     @Override
     public void onClick(View v) {
         switch(v.getId()){
